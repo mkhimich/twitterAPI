@@ -10,15 +10,14 @@ import twitter4j.auth.AccessToken
 
 
 /**
- * Created by yojjitsu on 22.03.2017.
+ * Created by mkhimich on 22.03.2017.
  */
 class BaseTwitt4jTest extends Specification {
     @Shared twitter = TwitterFactory.getSingleton();
     @Shared context = PropertiesContext.getInstance();
     @Shared date = new Date(context.getProperty("test.date"));
 
-     def setupSpec(){
-        twitter = TwitterFactory.getSingleton();
+     def setupSpec() {
         AccessToken accessToken = new AccessToken(context.getProperty("oauth.accessToken"), context.getProperty("oauth.accessTokenSecret"));
         twitter.setOAuthConsumer(context.getProperty("oauth.consumerKey"), context.getProperty("oauth.consumerSecret"));
         twitter.setOAuthAccessToken(accessToken);
@@ -29,9 +28,9 @@ class BaseTwitt4jTest extends Specification {
         List<Status> statuses = twitter.getHomeTimeline();
         expect: 'Dates fields are correct'
         statuses.each {
-            it.createdAt.after(date);
-            it.retweetCount == 0;
-            it.text.contains("back")
+            assert it.createdAt.after(date);
+            assert it.retweetCount == 0;
+            assert it.text.contains("back")
         }
     }
 
@@ -75,7 +74,7 @@ class BaseTwitt4jTest extends Specification {
         then:
         TwitterException e = thrown()
         expect:
-        e.getErrorMessage() == "Status is a duplicate."
+        e.getErrorMessage() == context.getProperty("test.duplicate.status")
         e.getMessage().startsWith("403:")
         cleanup:
         twitter.destroyStatus(status.getId())
