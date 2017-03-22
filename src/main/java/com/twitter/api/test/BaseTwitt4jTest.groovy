@@ -10,26 +10,30 @@ import twitter4j.auth.AccessToken
 
 
 /**
+ * Base tests using twitter4j library
+ *
  * Created by mkhimich on 22.03.2017.
  */
 class BaseTwitt4jTest extends Specification {
-    @Shared twitter = TwitterFactory.getSingleton();
-    @Shared context = PropertiesContext.getInstance();
-    @Shared date = new Date(context.getProperty("test.date"));
+    @Shared twitter = TwitterFactory.getSingleton()
+    @Shared context = PropertiesContext.getInstance()
+    @Shared date = new Date(context.getProperty("test.date"))
 
      def setupSpec() {
-        AccessToken accessToken = new AccessToken(context.getProperty("oauth.accessToken"), context.getProperty("oauth.accessTokenSecret"));
-        twitter.setOAuthConsumer(context.getProperty("oauth.consumerKey"), context.getProperty("oauth.consumerSecret"));
-        twitter.setOAuthAccessToken(accessToken);
+        AccessToken accessToken = new AccessToken(context.getProperty("oauth.accessToken"), context.getProperty("oauth.accessTokenSecret"))
+        twitter.setOAuthConsumer(context.getProperty("oauth.consumerKey"), context.getProperty("oauth.consumerSecret"))
+        twitter.setOAuthAccessToken(accessToken)
     }
 
     def "Verify basic fields"() {
         given:
-        List<Status> statuses = twitter.getHomeTimeline();
+        List<Status> statuses = twitter.getHomeTimeline()
         expect: 'Dates fields are correct'
         statuses.each {
-            assert it.createdAt.after(date);
-            assert it.retweetCount == 0;
+            //date is after 03/22/2017
+            assert it.createdAt.after(date)
+            assert it.retweetCount == 0
+            //all tweets at account have 'back' word
             assert it.text.contains("back")
         }
     }
@@ -50,12 +54,12 @@ class BaseTwitt4jTest extends Specification {
 
     def "Verify Status Update" () {
         given:
-        List<Status> statuses = twitter.getHomeTimeline();
+        List<Status> statuses = twitter.getHomeTimeline()
         when:
         def statusText = getStatusName()
-        Status status = twitter.updateStatus(statusText);
+        Status status = twitter.updateStatus(statusText)
         then:
-        List<Status> newStatuses = twitter.getHomeTimeline();
+        List<Status> newStatuses = twitter.getHomeTimeline()
         expect:
         newStatuses.size() > statuses.size()
         //first tweet updated.
